@@ -1,0 +1,244 @@
+<ion-header>
+  <ion-navbar color="mediumblue">
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Item Details</ion-title>
+  </ion-navbar>
+  <div>
+  </div>
+</ion-header>
+<ion-content>
+  <ion-spinner *ngIf="loading"></ion-spinner>
+
+  <ion-card *ngIf="error">
+    Item not found.
+  </ion-card>
+
+  <ion-card *ngIf="ItemData && ItemData.product" padding>
+    <h1 style="font-size:18px;line-height:1.2;"><b ion-text color="blue">{{ItemData?.product?.productName}}</b></h1>
+    <ion-row>
+      <ion-col>
+        <p ion-text color="blue">{{ItemData?.product?.reviewData?.totalReviewCount}} Reviews</p>
+      </ion-col>
+      <ion-col>
+        <p style="font-size:12px;"><b>Walmart #:</b>{{ItemData?.product?.usItemId}}</p>
+      </ion-col>
+    </ion-row>
+
+
+    <div style="margin-top:20px;" *ngIf="ItemData.product && ItemData.product.buyingOptions">
+
+      <div class="pricetag tagg tOrange" *ngIf="ItemData.product.buyingOptions.specialBuy"><span>Special Buy</span></div>
+      <div class="pricetag tagg tRed" *ngIf="ItemData.product.buyingOptions.rollback"><span>Rollback</span></div>
+      <div class="pricetag tagg tYellow" *ngIf="ItemData.product.buyingOptions.clearance"><span>Clearance</span></div>
+      <div class="pricetag tagg tBlue" *ngIf="ItemData.product.buyingOptions.onlyAtWalmart"><span>Only at Walmart</span></div>
+      <div class="pricetag tagg tBlue" *ngIf="ItemData.product.buyingOptions.storeOnlyItem"><span>Only In Store</span></div>
+      <div class="pricetag tagg tOrange" *ngIf="ItemData.product.buyingOptions.marketPlaceOnlySeller"><span>Marketplace Item</span></div>
+      <div class="pricetag tagg tOrange" *ngIf="ItemData.product.buyingOptions.pickupTodayOption"><span>Pickup Today</span></div>
+      <div class="pricetag tagg tBlue" *ngIf="ItemData.product.buyingOptions.onlineOnly"><span>Online Only</span></div>
+      <div class="pricetag tagg tBlue" *ngIf="ItemData.product.buyingOptions.comingSoon"><span>Coming Soon</span></div>
+      <div class="pricetag tagg tBlue" *ngIf="ItemData.product.buyingOptions.electronicDelivery"><span>Electronic Delivery</span></div>
+      <div class="pricetag tagg tOrange" *ngIf="ItemData.product.buyingOptions.exclusive"><span>Exclusive</span></div>
+      <div class="pricetag tagg tBlue" *ngIf="ItemData.product.buyingOptions.asAdvertised"><span>As Advertised</span></div>
+      <div class="pricetag tagg tGreen" *ngIf="ItemData.product.buyingOptions.nativeAddableToCart"><span>Instock Online</span></div>
+      <div class="pricetag tagg tYellow" *ngIf="!ItemData.product.buyingOptions.nativeAddableToCart"><span>Out of Stock Online</span></div>
+    </div>
+    <ion-slides #imageSlider pager>
+
+      <ion-slide *ngFor="let image of ItemData.product.imageAssets" text-center>
+        <img (click)="launch(image.versions.hero)" [src]="image.versions.tile">
+        <br>
+        <br>
+      </ion-slide>
+
+    </ion-slides>
+    <div *ngIf="ItemData.product.buyingOptions">
+      <h1 style="font-size: 30px;" *ngIf="ItemData.product.buyingOptions.price"><b ion-text color="blue">{{ItemData.product.buyingOptions.price.displayPrice}}</b></h1>
+
+      <h2 style="font-size: 12px;display:inline;padding-right:10px;" *ngIf="ItemData.product.buyingOptions.unitPrice">
+  <b ion-text color="blue" [innerHTML]="ItemData.product.buyingOptions.unitPrice.displayPricePerUnit"></b>
+  </h2>
+      <h2 style="font-size: 12px;display:inline;padding-right:10px;" *ngIf="ItemData.product.buyingOptions.wasPrice">
+  <b ion-text color="blue">Was:</b> <b ion-text color="blue" [innerHTML]="ItemData.product.buyingOptions.wasPrice.displayPrice"></b>
+  </h2>
+      <h2 style="font-size: 12px;display:inline;padding-right:10px;" *ngIf="ItemData.product.buyingOptions.displaySavings">
+  <b style="text-decoration:line-through;" *ngIf="ItemData.product.buyingOptions.listPrice">{{ItemData.product.buyingOptions.listPrice.displayPrice}}</b>
+  <b ion-text color="red">Save </b><b ion-text color="red" [innerHTML]="ItemData.product.buyingOptions.displaySavings"></b></h2>
+    </div>
+
+    <div *ngIf="store">
+      <ion-item *ngIf="store.storeid" text-wrap>
+        <h2><ion-icon color="yellow" name="pin"></ion-icon><b ion-text color="mediumblue"> Info from store #{{store?.storeid}}</b></h2>
+        <p>{{store?.address}}</p>
+        <p><b>
+    {{store?.city}}, {{store?.st}}
+    </b></p>
+        <p>{{store?.phone}}</p>
+        <div class="item-note" item-right>
+          <h2><b>{{store?.distance}}</b> mi</h2>
+        </div>
+      </ion-item>
+      <h2 style="font-size: 12px;display:inline;padding-right:10px;" *ngIf="store.price">
+    <b ion-text color="blue" *ngIf="store.price.priceInCents">Store Price: {{(store.price.priceInCents / 100).toFixed(2)}}</b>
+    </h2>
+      <ion-item *ngIf="store.inventory.quantity !== -1 && store.inventory.quantity !== 0">
+        <p>
+          <ion-icon ion-text color="blue" name="ios-cube"></ion-icon> <b>{{store?.inventory?.quantity}}</b> on hand*
+        </p>
+        <p *ngIf="store.inventory.status === 'In Stock' || store.inventory.status === 'Out of Stock'">
+          <b>{{store?.inventory?.status}}</b>
+        </p>
+      </ion-item>
+      <ion-item text-wrap *ngIf="store">
+        <p>
+          <ion-icon ion-text color="yellow" name="pin"></ion-icon> <b>{{store?.department?.name}} Department</b></p>
+        <div *ngIf="store.location.detailed[0]">
+          <p>
+            in Aisle
+            <b *ngFor="let loc of store.location.detailed; let last = last; let first = first;"><i *ngIf="!last && !first">, </i><i *ngIf="last && !first">, or </i>{{loc?.zone}}.{{loc?.aisle}}.{{loc?.section}}</b> </p>
+        </div>
+      </ion-item>
+
+    </div>
+
+
+    <ion-row>
+      <ion-col>
+        <button ion-button icon-left (click)="itemLookup()" primary clear small>
+          <ion-icon name="search"></ion-icon>
+          <div>Stores</div>
+        </button>
+      </ion-col>
+      <ion-col>
+        <button ion-button icon-left (click)="shareItem(ItemData.description, ItemData.product.productName, 'http://walmart.com' + ItemData.product.canonicalUrl)" primary clear small>
+          <ion-icon name="share"></ion-icon>
+          <div>Share</div>
+        </button>
+      </ion-col>
+      <ion-col>
+        <button ion-button icon-left (click)="Data.launch('http://walmart.com'+ItemData.product.canonicalUrl)" primary clear small>
+          <ion-icon name="link"></ion-icon>
+          <div>Website</div>
+        </button>
+      </ion-col>
+    </ion-row>
+  </ion-card>
+  <ion-list>
+  <ion-list-header (click)="toggleDescription = toggleDescription ? false : true">
+  <h4>Description<ion-icon *ngIf="!toggleDescription" style="float:right;" name="ios-arrow-down"></ion-icon><ion-icon *ngIf="toggleDescription" style="float:right;" name="ios-arrow-up"></ion-icon></h4>
+  </ion-list-header>
+  <ion-item text-wrap *ngIf="toggleDescription && ItemData.product.longDescription">
+  <p [innerHTML]="ItemData.product.longDescription"></p>
+  </ion-item>
+  </ion-list>
+  <ion-list>
+    <ion-list-header (click)="toggleWarranty = toggleWarranty ? false : true">
+    <h4>Warranty<ion-icon *ngIf="!toggleWarranty" style="float:right;" name="ios-arrow-down"></ion-icon><ion-icon *ngIf="toggleWarranty" style="float:right;" name="ios-arrow-up"></ion-icon></h4>
+    </ion-list-header>
+    <ion-item text-wrap *ngIf="toggleWarranty">
+    <ion-row *ngFor="let info of ItemData.idml.idmlMap.Modules.Warranty">
+    <ion-col>Product Warranty:</ion-col>
+    <ion-col *ngFor="let value of info.values"><b blue style="float:right;">{{value}}</b></ion-col>
+
+    </ion-row>
+    </ion-item>
+    <div text-wrap *ngIf="toggleWarranty && ItemData.carePlans">
+    <ion-item *ngFor="let info of ItemData.carePlans.carePlans">
+    <ion-row>
+    <ion-col width-25><img [src]="info.imageAsset"></ion-col>
+    <ion-col><h2><b blue>{{info.carePlanDisplayPrice}}</b></h2></ion-col>
+
+    </ion-row>
+    <b blue style="float:right;">{{info.productName}}</b>
+    <p [innerHTML]="info.longDescription"></p>
+
+    </ion-item>
+    </div>
+
+    </ion-list>
+  <ion-list>
+    <ion-list-header (click)="toggleSpecific = toggleSpecific ? false : true">
+      <h4>Specifications<ion-icon *ngIf="!toggleSpecific" style="float:right;" name="ios-arrow-down"></ion-icon><ion-icon *ngIf="toggleSpecific" style="float:right;" name="ios-arrow-up"></ion-icon></h4>
+    </ion-list-header>
+    <ion-item text-wrap *ngIf="toggleSpecific">
+
+      <style>
+        .table:nth-child(2n+2) {
+          background: #CCC
+        }
+      </style>
+
+      <table style="width:100%">
+        <tr class="table" *ngFor="let info of ItemData.idml.idmlMap.Modules.Specifications.specifications.values[0].nameValueList">
+          <td style="vertical-align: initial;"><b>{{info.displayName}}</b></td>
+          <table style="width:100%">
+            <tr *ngFor="let value of info.values">
+              <td style="float:right;"><b blue>{{value}}</b></td>
+            </tr>
+          </table>
+      </table>
+
+
+
+
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header (click)="toggleDetails = toggleDetails ? false : true">
+      <h4>Details<ion-icon *ngIf="!toggleDetails" style="float:right;" name="ios-arrow-down"></ion-icon><ion-icon *ngIf="toggleDetails" style="float:right;" name="ios-arrow-up"></ion-icon></h4>
+    </ion-list-header>
+    <div *ngIf="toggleDetails">
+      <ion-item class="table">Brand:<button style="font-size:1.4rem;" clear item-right>{{ItemData.product.brand}}</button></ion-item>
+      <ion-item class="table">Manufacturer:<button style="font-size:1.4rem;" clear item-right>{{ItemData.product.manufacturerName}}</button></ion-item>
+      <ion-item class="table">Manufacturer Product ID:<button style="font-size:1.4rem;" clear item-right>{{ItemData.product.manufacturerProductId}}</button></ion-item>
+      <ion-item class="table">Product ID:<button style="font-size:1.4rem;" clear item-right>{{ItemData.product.productId}}</button></ion-item>
+      <ion-item class="table">UPC:<button style="font-size:1.4rem;" clear item-right>{{ItemData.product.upc}}</button></ion-item>
+      <ion-item class="table">US Item ID:<button style="font-size:1.4rem;" clear item-right>{{ItemData.product.usItemId}}</button></ion-item>
+      <ion-item class="table">Walmart Item Number:<button style="font-size:1.4rem;" clear item-right>{{ItemData.product.walmartItemNumber}}</button></ion-item>
+      <ion-item class="table">Wide UPC:<button style="font-size:1.4rem;" clear item-right>{{ItemData.product.wupc}}</button></ion-item>
+      <div *ngIf="ItemData.product.buyingOptions">
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.asAdvertised"><button style="font-size:1.4rem;" clear item-right>As Advertised</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.available"><button style="font-size:1.4rem;" clear item-right>Available</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.blitzItem"><button style="font-size:1.4rem;" clear item-right>Blitz Item</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.clearance"><button style="font-size:1.4rem;" clear item-right>Clearance</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.comingSoon"><button style="font-size:1.4rem;" clear item-right>Coming Soon</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.deliverableByHoliday"><button style="font-size:1.4rem;" clear item-right>Deliverable by Holiday</button></ion-item>
+        <ion-item class="table">Arrival Date:<button style="font-size:1.4rem;" clear item-right>{{ItemData.product.buyingOptions.displayArrivalDate}}</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.electronicDelivery"><button style="font-size:1.4rem;" clear item-right>Electronic Delivery</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.exclusive"><button style="font-size:1.4rem;" clear item-right>Exclusive</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.freePickupAvailable"><button style="font-size:1.4rem;" clear item-right>Free Pickup Available</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.freeShipping"><button style="font-size:1.4rem;" clear item-right>Free Shipping Available</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.freeShippingThresholdEligible"><button style="font-size:1.4rem;" clear item-right>Free Shipping after threshold</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.freight"><button style="font-size:1.4rem;" clear item-right></button></ion-item>
+        <ion-item class="table">Fullfilment:<button style="font-size:1.4rem;" clear item-right>{{ItemData.product.buyingOptions.fulfillmentOptionsAvailable}}</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.new"><button style="font-size:1.4rem;" clear item-right>New</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.onlineOnly"><button style="font-size:1.4rem;" clear item-right>Online Only</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.onlyAtWalmart"><button style="font-size:1.4rem;" clear item-right>Only at Walmart</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.pickupable"><button style="font-size:1.4rem;" clear item-right>Store Pickup Available</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.preorder"><button style="font-size:1.4rem;" clear item-right>PreOrder</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.price">Price:<button style="font-size:1.4rem;" clear item-right>{{ItemData.product.buyingOptions.price.displayPrice}}</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.quantityOptions">Selectable Quantity:<button style="font-size:1.4rem;" clear item-right>{{ItemData.product.buyingOptions.quantityOptions.length}}</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.rebateAvailable"><button style="font-size:1.4rem;" clear item-right>Rebate Available</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.reducedPrice"><button style="font-size:1.4rem;" clear item-right>Reduced Price</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.rollback"><button style="font-size:1.4rem;" clear item-right>Rollback</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.seller">Seller:<button style="font-size:1.4rem;" clear item-right>{{ItemData.product.buyingOptions.seller.displayName}}</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.seller"><button style="font-size:1.4rem;" clear item-right>Sold on Walmart.com</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.shippable"><button style="font-size:1.4rem;" clear item-right>Shippible</button></ion-item>
+        <ion-item class="table">Delivery:<button style="font-size:1.4rem;" clear item-right>{{ItemData.product.buyingOptions.shippingDeliveryDateMessage}}</button></ion-item>
+        <ion-item class="table">Pickup:<button style="font-size:1.4rem;" clear item-right>{{ItemData.product.buyingOptions.pickupDeliveryDateMessage}}</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.specialBuy"><button style="font-size:1.4rem;" clear item-right>Special Buy</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.buyingOptions.storeOnlyItem"><button style="font-size:1.4rem;" clear item-right>Store Only Item</button></ion-item>
+        <ion-item class="table" *ngIf="ItemData.product.carePlanItem"><button style="font-size:1.4rem;" clear item-right>Product Care Plan Available</button></ion-item>
+      </div>
+    </div>
+  </ion-list>
+
+</ion-content>
+<ion-footer style="text-align:center;">
+  UPC: {{upc}}
+  <ion-toolbar style="height:40px;" position="bottom">
+    <img style="height:100%;max-width:340px;" [src]="Data.textToBase64Barcode(upc)">
+  </ion-toolbar>
+</ion-footer>

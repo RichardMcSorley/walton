@@ -1,0 +1,116 @@
+<!--
+  Generated template for the WelcomePage page.
+
+  See http://ionicframework.com/docs/v2/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+
+<ion-header>
+
+  <ion-navbar color="mediumblue">
+    <button *ngIf="didtut" ion-button menuToggle>
+      <ion-icon  name="menu"></ion-icon>
+    </button>
+        <ion-title>Welcome</ion-title>
+    <ion-buttons end>
+      <button ion-button (click)="slideTo(6)">Skip</button>
+    </ion-buttons>
+
+  </ion-navbar>
+
+</ion-header>
+
+<style media="screen">
+  ion-slide{
+    align-items:baseline;
+  }
+  p{
+    text-align:left;padding-left:4px;margin-top:0px;
+  }
+
+</style>
+
+<ion-content class="welcome" padding>
+
+
+
+  <ion-slides #tutSlider pager>
+
+  <ion-slide >
+      <ion-card>
+        <img src="assets/images/tutb.png">
+        <ion-item text-wrap>
+           <h2>Thank you for using Walton</h2>
+           <p>A fast way to find information to help your customers!</p>
+         </ion-item>
+         <ion-fab right style="margin-top:-20px;">
+          <button color="darkblue" ion-fab mini><ion-icon name="people"></ion-icon></button>
+        </ion-fab>
+      </ion-card>
+  </ion-slide>
+  <ion-slide>
+    <ion-card>
+      <img src="assets/images/tut4.png">
+      <ion-item text-wrap>
+         <h2>You can find an Item location and Modular Locations.</h2>
+         <p>Combine
+         Walton with an MC40/TC70 to find exact location using "Scan to Set" with Barcodes that are generated
+         using Walton.</p>
+       </ion-item>
+       <ion-fab right style="margin-top:-20px;">
+        <button color="mediumblue" ion-fab mini><ion-icon name="barcode"></ion-icon></button>
+      </ion-fab>
+    </ion-card>
+
+  </ion-slide>
+
+  <ion-slide>
+    <ion-card>
+      <img src="assets/images/tut1.png">
+      <ion-item text-wrap>
+         <h2>Everything up to this point has been possible because of you!</h2>
+         <p>
+           Thank you, for all that you do!
+         </p>
+       </ion-item>
+       <ion-fab right style="margin-top:-20px;">
+        <button color="lightblue" ion-fab mini><ion-icon name="at"></ion-icon></button>
+      </ion-fab>
+    </ion-card>
+  <style>
+  .swiper-slide {
+      overflow-y: scroll;
+      display: block;
+  }
+  </style>
+</ion-slide >
+       <ion-slide style="height:auto;">
+
+            <ion-item class="showhelp" *ngIf="!showhelp">
+            <h3>Let's begin by typing your Zipcode.</h3>
+            </ion-item>
+                 <ion-list>
+              <ion-item>
+              <ion-label floating>Zip Code</ion-label>
+              <ion-input type="number" min="00000" max="99999" (input)="loadStores($event)" [(ngModel)]="getzipcode"></ion-input>
+              </ion-item>
+              </ion-list>
+            <ion-item *ngIf="showhelp">
+            <p>Now pick your store...</p>
+            </ion-item>
+              <ion-spinner *ngIf="loading"></ion-spinner>
+                <ion-item *ngFor="let store of getstores" (click)="changeStore(store.id, store.address.city, store.address.state, store.address.postalCode, store.geoPoint.latitude, store.geoPoint.longitude)">
+              <h2><ion-icon color="yellow" name="pin"></ion-icon><b color="mediumblue"> #{{store.id}}</b></h2>
+              <p>{{store.address.address1}}</p>
+              <p><b>
+              {{store.address.city}}, {{store.address.state}}
+              </b></p>
+
+            </ion-item>
+
+
+       </ion-slide>
+     </ion-slides>
+
+
+</ion-content>

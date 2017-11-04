@@ -1,0 +1,58 @@
+page-item-details {
+  .pricetag {
+    clear: both;
+    height: 16px;
+    padding: 0 10px;
+    margin-bottom: 4px;
+    border-radius: 0 50px 50px 0;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 16px;
+    float: left;
+  }
+
+  .tBlue {
+    background: #007dc6;
+    color: #fff;
+  }
+
+  .tYellow {
+    background: #ffc120;
+    color: #fff;
+  }
+
+  .tRed {
+    background: #f42121;
+    color: #fff;
+  }
+
+  .tOrange {
+    background: #f47421;
+    color: #fff;
+  }
+
+  .tGreen {
+    background: #76c143;
+    color: #fff;
+  }
+
+  .tMaroon {
+    background: midnightblue;
+    color: #fff;
+  }
+
+  .pricetag:nth-child(even) {
+    border-radius: 50px 0px 0px 50px;
+    float: right!important;
+    margin-top: -20px;
+  }
+  ion-card img {
+    display: inline;
+  }
+}
+.card-brick{
+  max-width: 320px;
+}
+.details-brick{
+  max-width: 650px;
+}

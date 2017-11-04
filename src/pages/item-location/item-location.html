@@ -1,0 +1,51 @@
+<ion-header>
+  <ion-navbar color="mediumblue">
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Item Location</ion-title>
+  </ion-navbar>
+  <div>
+  </div>
+
+</ion-header>
+<ion-content>
+  <ion-list *ngIf="!showLoading">
+  <ion-item text-wrap *ngFor="let item of final" (click)="Data.callPhone(item.phone)">
+    <h2><ion-icon color="yellow" name="pin"></ion-icon><b ion-text color="mediumblue"> #{{item.storeid}} {{item.display}}</b></h2>
+
+  <p>{{item.address}}</p>
+  <p><b>
+  {{item.city}}, {{item.st}}
+  </b></p>
+  <p>{{item.phone}}</p>
+  <ion-icon ion-text color="blue" name="ios-cube"></ion-icon> <b>{{item?.inventory?.quantity}}</b> on hand*
+  <p><ion-icon ion-text color="yellow" name="pin"></ion-icon> In {{item?.department.name}} <b *ngFor="let loc of item.location.detailed"> {{loc?.zone}}.{{loc?.aisle}}.{{loc?.section}}</b> </p>
+
+      <div class="item-note" item-right>
+
+        <h2><b>{{item.distance}}</b> mi</h2>
+        <h2 *ngIf="item.price.priceInCents"><b ion-text color="blue">${{(item.price.priceInCents / 100).toFixed(2)}}</b></h2>
+
+  <p *ngIf="item.inventory.quantity !== -1 && item.inventory.quantity !== 0">
+
+  </p>
+    <p>
+      Tap to Call
+    </p>
+</div>
+  </ion-item>
+  </ion-list>
+
+<ion-spinner *ngIf="showLoading"></ion-spinner>
+<ion-footer class="footer-item">
+    <ion-item  text-wrap>
+      <ion-thumbnail item-left>
+        <img [src]="item.image">
+      </ion-thumbnail>
+      <h2 class="text-wrap" [innerHTML]="item.name"></h2>
+    </ion-item>
+</ion-footer>
+<h1 *ngIf="!showLoading && final.length == 0"><i>Could not find items.</i></h1>
+<h1 *ngIf="showErrorMessage"><i>Move along,<br> Nothing to see here...</i></h1>
+</ion-content>

@@ -1,0 +1,148 @@
+
+<ion-header class="wm-header">
+  <ion-navbar  color="primary" >
+    <button ion-button icon-only menuToggle>
+      <ion-icon name="menu"></ion-icon>
+      </button>
+  <ion-title  *ngIf="storeitems.length < 1">Home</ion-title>
+  <ion-title *ngIf="storeitems.length > 1">Search</ion-title>
+<ion-buttons end>
+  <button (click)="scanBarcode()" class="right-button" ion-button icon-only>
+    <ion-icon name="barcode"></ion-icon>
+  </button>
+  <button (click)="Data.presentPopover($event)" class="right-button" ion-button icon-only>
+    <ion-icon name="more"></ion-icon>
+  </button>
+</ion-buttons>
+  </ion-navbar>
+  <div class="wm-searchbar">
+  <ion-searchbar placeholder="Search" [(ngModel)]="searchInput" (ionInput)="autoComplete($event)" (ionFocus)="doShowAuto()" (ionBlur)="dontShowAuto()" (ionClear)="dontShowAuto(); storeitems = []; keyboard.close();"  (search)="getItems($event)"></ion-searchbar>
+  <ion-card class="autocomplete-container">
+    <ion-list *ngIf="showAuto" style="margin-left: 60px;background-color:white;">
+      <button ion-item *ngFor="let auto of autocomplete" (click)="getItems({target:{value: auto}})">
+        <h2>{{auto}}</h2>
+      <div class="item-note" item-right>
+      <ion-icon style="" name="open" color="blue"></ion-icon>
+          </div>
+      </button>
+    </ion-list>
+  </ion-card>
+  </div>
+  <ion-segment class="wm-searchset" [(ngModel)]="searchset">
+    <ion-segment-button (click)="selectSide(searchInput, 'dotcom')" value="dotcom">
+      Walmart.com
+    </ion-segment-button>
+    <ion-segment-button (click)="selectSide(searchInput, 'store')" value="store">
+      My Store: {{Data.savedStore?.storeid}}
+    </ion-segment-button>
+  </ion-segment>
+</ion-header>
+
+<ion-content>
+  <ion-spinner *ngIf="loading"></ion-spinner>
+
+  <div [ngSwitch]="searchset" *ngIf="searchInput.length !==0">
+    <masonry [useImagesLoaded]="false" *ngSwitchCase="'dotcom'">
+      <masonry-brick class="item-brick" *ngFor="let item of dotcomitems" ion-item (click)="openDetailsPageDotcom( item.iD, item.uPC, item.name, item.imageThumbnailUrl)">
+        <ion-thumbnail item-left>
+          <img [src]="item?.imageThumbnailUrl">
+        </ion-thumbnail>
+        <h2 [innerHTML]="item.name"></h2>
+        <div class="item-note" item-right>
+            <h2 class="under-thumb"><b ion-text color="blue">{{item?.price}}</b></h2>
+        </div>
+      </masonry-brick>
+    </masonry>
+    <masonry [useImagesLoaded]="false" *ngSwitchCase="'store'">
+      <masonry-brick class="item-brick" *ngFor="let store of storeitems" ion-item (click)="openDetailsPageStore( store.productId.WWWItemId, store.productId.upc, store, store.name, store.images.thumbnailUrl )">
+        <ion-thumbnail item-left>
+          <img [src]="store?.images?.thumbnailUrl">
+        </ion-thumbnail>
+        <h2 >{{store?.name}}</h2>
+        <div *ngIf="store.inventory.quantity !== -1 && store.inventory.quantity !== 0">
+          <p>
+            <ion-icon ion-text color="blue" name="ios-cube"></ion-icon> <b>{{store?.inventory?.quantity}}</b> on hand*
+          </p>
+      </div>
+        <p><ion-icon ion-text color="yellow" name="pin"></ion-icon> In {{store?.department.name}} <b *ngFor="let loc of store.location.detailed"> {{loc?.zone}}.{{loc?.aisle}}.{{loc?.section}}</b> </p>
+          <div class="item-note" item-right>
+              <h2 class="under-thumb" *ngIf="store.price.priceInCents"><b ion-text color="blue">${{(store?.price?.priceInCents / 100).toFixed(2)}}</b></h2>
+          </div>
+      </masonry-brick>
+    </masonry>
+  </div>
+  <masonry [useImagesLoaded]="true" style="  margin: 0 auto;" [options]="{ fitWidth: true }" *ngIf="searchInput.length == 0">
+    <masonry-brick class="blog-brick" *ngFor="let item of finalblog">
+      <ion-card>
+        <ion-item>
+          <ion-avatar item-left>
+            <img [src]="item.aimage">
+          </ion-avatar>
+          <h2>{{item.blogname}}</h2>
+        </ion-item>
+        <div class="image-container">
+          <img *ngIf="item.thumbnail" [src]="item.thumbnail">
+        </div>
+        <ion-card-content>
+          <h2><b>{{item.title}}</b></h2>
+          <p style="display: -webkit-box;
+      margin: 0 auto;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+  " [innerHTML]="item.description">
+            </p>
+        </ion-card-content>
+
+        <ion-row>
+          <ion-col>
+            <button ion-button icon-left (click)="shareItem(item.description, item.title, item.link)" primary clear small>
+          <ion-icon name="share"></ion-icon>
+          <div>Share</div>
+        </button>
+          </ion-col>
+          <ion-col>
+            <button ion-button icon-left (click)="Data.launch(item.link)" primary clear small>
+          <ion-icon name="link"></ion-icon>
+          <div>Read More</div>
+        </button>
+          </ion-col>
+          <ion-col center text-center>
+            <ion-note>
+              {{item.pubDate.slice(0, -19)}}.
+            </ion-note>
+          </ion-col>
+        </ion-row>
+
+      </ion-card>
+    </masonry-brick>
+  </masonry>
+
+  <ion-list>
+    <ion-row>
+      <ion-col class="ion-col" width-33>
+      </ion-col>
+    </ion-row>
+  </ion-list>
+
+  <ion-infinite-scroll *ngIf="dotcomitems.length > 0 && searchset === 'dotcom'" (ionInfinite)="doInfiniteDotcom($event)">
+    <ion-infinite-scroll-content loadingText="Loading more..."></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+  <ion-infinite-scroll *ngIf="storeitems.length > 0 && searchset === 'store'" (ionInfinite)="doInfinite($event)">
+    <ion-infinite-scroll-content loadingText="Loading more..."></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+  <ion-infinite-scroll *ngIf="searchInput.length == 0" (ionInfinite)="doInfiniteBlog($event)">
+    <ion-infinite-scroll-content loadingText="Loading more..."></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+
+  <ion-footer style="position:fixed;" *ngIf="error.length > 0">
+    <ion-toolbar>
+      <ion-item text-wrap>
+        <ion-icon name="alert" danger></ion-icon>
+        {{error}}
+      </ion-item>
+    </ion-toolbar>
+  </ion-footer>
+</ion-content>

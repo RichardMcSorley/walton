@@ -1,0 +1,74 @@
+@import "colors/_wm-core.scss";
+@import "colors/_wm-light-tints.scss";
+@import "colors/_wm-darker-shades.scss";
+
+/* Splash */
+#splash {
+  position: absolute;
+  background-color: $wm-color-blue-primary;
+  width: 100vw;
+  height: 100vh;
+}
+
+%translator-center {
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+}
+.center-white {
+  color: $wm-color-white;
+  text-align: center;
+}
+
+%messages-template {
+  font-size: 36px;
+  position: absolute;
+  top: 60vh;
+  left: 50vw;
+  width: 100%;
+  @extend .center-white;
+  @extend %translator-center;
+}
+
+.show {
+  display: block !important;
+}
+
+.remove-splash-screen {
+  display: none;
+}
+
+.loading {
+  &-messages {
+    &-1 {
+      @extend %messages-template;
+    }
+    &-2 {
+      @extend %messages-template;
+    }
+    &-3 {
+      @extend %messages-template;
+      margin-top: 100px!important;
+    }
+  }
+  &-app-name {
+    position: absolute;
+    top: 53vh;
+    left: 50vw;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 48px;
+    width: 50vw;
+    @extend .center-white;
+    @extend %translator-center;
+  }
+
+  &-img-prop {
+    position: absolute;
+    top: 34vh;
+    left: 50vw;
+    height: 20vh;
+    width: 80vw;
+    @extend %translator-center;
+  }
+
+}
